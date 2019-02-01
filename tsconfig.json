@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "declaration": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "removeComments": false,
+    "moduleResolution": "node",
+    "noLib": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "noEmit": true,
+    "noEmitHelpers": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@peka2tv/libs/*": [ "./libs/*" ]
+    },
+    "importHelpers": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [ "es6" ],
+    "strict": true,
+    "strictPropertyInitialization": false
+  },
+  "exclude": [
+    "node_modules",
+    "__test__"
+  ]
+}
