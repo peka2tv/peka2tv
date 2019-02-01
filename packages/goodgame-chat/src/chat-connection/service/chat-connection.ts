@@ -1,16 +1,15 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CONFIG } from '../../config/config';
-/* tslint:disable:no-submodule-imports */
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import * as WebSocket from 'ws';
-import { TChatEvent, IChatMessageData, TChatMessageEvent } from '../interface';
+import { TChatEvent, IChatEventMap } from '../interface';
 import { take, filter, map } from 'rxjs/operators';
 import { CHAT_EVENT_TYPE } from '../const';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class ChatConnectionService implements OnModuleInit {
-  private chatConnection: WebSocketSubject<TChatEvent>;
+  private chatConnection: WebSocketSubject<TChatEvent<keyof IChatEventMap>>;
 
   // TODO: delay  startup until connection done
   public onModuleInit() {
@@ -19,7 +18,7 @@ export class ChatConnectionService implements OnModuleInit {
 
   public connect(
   ) {
-    this.chatConnection = webSocket<TChatEvent>({
+    this.chatConnection = webSocket<TChatEvent<keyof IChatEventMap>>({
       url: CONFIG.endpoints.chat,
       WebSocketCtor: WebSocket,
     });
@@ -38,21 +37,26 @@ export class ChatConnectionService implements OnModuleInit {
     );
   }
 
-  public onMessage(): Observable<IChatMessageData> {
+  public onEvent<T extends keyof IChatEventMap>(type: T): Observable<IChatEventMap[T]> {
     return this.chatConnection.pipe(
-      filter((event): event is TChatMessageEvent => event.type === CHAT_EVENT_TYPE.message),
+      filter((event) => event.type === type),
       map(({ data }) => data),
     );
   }
 
-  public joinChannel(channelId: number): void {
+  public joinChannel(channelId: string): void {
     this.sendEvent(CHAT_EVENT_TYPE.join, {
       channel_id: channelId
     });
   }
 
-  private sendEvent<T extends CHAT_EVENT_TYPE, TData>(type: T, data: TData): void {
-    // TODO: fix any
-    this.chatConnection.next({ type, data } as any);
+  public leaveChannel(channelId: string): void {
+    this.sendEvent(CHAT_EVENT_TYPE.leave, {
+      channel_id: channelId
+    });
+  }
+
+  private sendEvent<T extends keyof IChatEventMap>(type: T, data: IChatEventMap[T]): void {
+    this.chatConnection.next({ type, data });
   }
 }
