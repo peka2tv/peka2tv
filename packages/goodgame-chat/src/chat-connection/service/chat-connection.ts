@@ -25,7 +25,7 @@ export class ChatConnectionService implements OnModuleInit {
 
     // TODO: remove after testing
     this.chatConnection.subscribe({
-      next: event => console.log('> event', event),
+      /* next: event => console.log('> event', event), */
       error: error => console.log('> error', error),
       complete: () => console.log('> completed'),
     });

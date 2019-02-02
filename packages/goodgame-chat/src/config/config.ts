@@ -7,7 +7,14 @@ export const DEFAULT_CONFIG = {
   },
   endpoints: {
     chat: 'wss://chat-1.goodgame.ru/chat2/',
-  }
+    api: 'https://goodgame.ru/api',
+  },
+  db: {
+    host: 'localhost',
+    user: 'root',
+    password: 'vagrant',
+    database: 'sc2tv2'
+  },
 };
 
 export const CONFIG = {
