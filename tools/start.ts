@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { run } from './utils';
 
 const PACKAGES_FOLDER_NAME = 'packages';
 const RUN_DIRECTORY = process.env.INIT_CWD || '';
@@ -16,7 +16,3 @@ if (!projectName) {
 }
 
 run(`yarn ts-node ${serviceEntryPoint} ${argumentsString}`);
-
-function run(command: string) {
-  execSync(command, { cwd: process.cwd(), stdio: 'inherit' });
-}

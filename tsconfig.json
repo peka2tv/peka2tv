@@ -10,7 +10,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "noEmit": true,
     "noEmitHelpers": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
@@ -23,7 +22,8 @@
     "allowSyntheticDefaultImports": true,
     "lib": [ "es6" ],
     "strict": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true
   },
   "exclude": [
     "node_modules",

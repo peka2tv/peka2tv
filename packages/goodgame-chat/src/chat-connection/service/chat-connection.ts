@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CONFIG } from '../../config/config';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
 import { TChatEvent, IChatEventMap } from '../interface';
 import { take, filter, map } from 'rxjs/operators';
 import { CHAT_EVENT_TYPE } from '../const';

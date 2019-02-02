@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "build": "yarn ts-node tools/build.ts",
     "start": "yarn ts-node tools/start.ts"
   },
   "dependencies": {
@@ -19,11 +20,22 @@
     "@types/html-entities": "^1.2.16",
     "@types/node": "^10.12.21",
     "@types/socket.io-client": "^1.4.32",
+    "@types/webpack": "^4.4.24",
     "@types/ws": "^6.0.1",
+    "@types/yargs": "^12.0.8",
+    "pkg": "^4.3.7",
     "prettier": "^1.16.3",
+    "ts-loader": "^5.3.3",
     "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
     "tslint-config-prettier": "^1.17.0",
-    "typescript": "^3.3.1"
+    "typescript": "^3.3.1",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
+    "webpack-node-externals": "^1.7.2",
+    "yargs": "^12.0.5"
+  },
+  "resolutions": {
+    "terser": "3.14.1"
   }
 }
