@@ -10,8 +10,7 @@ const ENV_FILE_PATH = process.env.NODE_ENV === 'production'
 export const defaultConfig = {
   port: 3900,
   sdk: {
-    host: '127.0.0.1',
-    port: 3812,
+    url: 'http://127.0.0.1:3812',
   },
   endpoints: {
     chat: 'wss://chat.goodgame.ru/chat/websocket',

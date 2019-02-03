@@ -8,12 +8,15 @@ import { timer, throwError, of, Observable, forkJoin } from 'rxjs';
 import { GoodgameApiService } from '../../api/service/api';
 import { IChannel } from '../interface';
 import { DbService } from '../../db/service/db';
+import { Peka2tvChatSdkService } from '../../peka2tv-chat-sdk/service/sdk';
+import { IPeka2tvChatNewMessage } from '../../peka2tv-chat-sdk/interface';
 
 const CHANNEL_STATUS_REQUEST_TIMEOUT_MS = 5 * 1000;
 const CHANNELS_LOAD_INTERVAL_MS = 2 * 60 * 1000;
 const ENTITIES = new AllHtmlEntities();
 const HTML_URLS_REG_EXP = new RegExp('(<a[^>]*href\="([^"]*)"[^>]*>[^<]*<\/a>)', 'ig');
 const GOODGAME_CHANNEL_ID_FORMAT_REG_EXP = /^[0-9]+$/;
+const PEKA2TV_CHANNEL_PREFIX = 'goodgame.ru/';
 const SMILES_PREFIX = 'gg-';
 const SMILES_REG_EXP = new RegExp('(:[a-zA-Z0-9_]+:)', 'g');
 const STREAM_GOODGAME_PROVIDER = 'goodgame.ru';
@@ -26,6 +29,7 @@ export class MessagesProxyService implements OnModuleInit {
     private chatConnectionService: ChatConnectionService,
     private goodgameApiService: GoodgameApiService,
     private dbService: DbService,
+    private peka2tvChatSdkService: Peka2tvChatSdkService,
   ) {
   }
 
@@ -116,21 +120,31 @@ console.log('> remove channel', channelId);
   private listenChannelsMessages(): void {
     this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.message)
       .pipe(
+        filter(message => !!this.connectedChannels[message.channel_id]),
         map(message => this.formatMessage(message)),
       )
-      .subscribe(message => {
-        console.log('> message', message.channel_id, message.message_id, message.text);
-      });
+      .subscribe(message => this.peka2tvChatSdkService.send(message));
   }
 
-  private formatMessage(message: IChatMessageData): IChatMessageData {
+  private formatMessage(message: IChatMessageData): IPeka2tvChatNewMessage {
     let text = message.text.replace(HTML_URLS_REG_EXP, '$2');
 
     text = ENTITIES.decode(text);
 
     text = text.replace(SMILES_REG_EXP, smile => ':' + SMILES_PREFIX + smile.slice(1));
 
-    return { ...message, text };
+    const channel = this.connectedChannels[message.channel_id];
+
+    const peka2tvChatMessage: IPeka2tvChatNewMessage = {
+      type: 'message',
+      time: Date.now(),
+      channel: `${PEKA2TV_CHANNEL_PREFIX}${channel.streamerId}`,
+      from: { id: 0, name: message.user_name },
+      to: null,
+      text,
+    };
+
+    return peka2tvChatMessage;
   }
 
   private loadActiveChannels(): Observable<IChannel[]> {
