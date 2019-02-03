@@ -23,6 +23,13 @@ export const defaultConfig = {
     database: 'sc2tv2',
     connectionLimit: 10,
   },
+  logging: {
+    enabled: true,
+    ggChatAllEvents: false,
+    ggChatMainEvents: true,
+    peka2tvSdkAllEvents: false,
+    peka2tvSdkMainEvents: true,
+  },
 };
 
 let envConfig: Partial<typeof defaultConfig> = {};

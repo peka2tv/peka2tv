@@ -10,6 +10,8 @@ import { IChannel } from '../interface';
 import { DbService } from '../../db/service/db';
 import { Peka2tvChatSdkService } from '../../peka2tv-chat-sdk/service/sdk';
 import { IPeka2tvChatNewMessage } from '../../peka2tv-chat-sdk/interface';
+import { LoggerService } from '../../shared/service/logger';
+import { CONFIG } from '../../config/config';
 
 const CHANNEL_STATUS_REQUEST_TIMEOUT_MS = 5 * 1000;
 const CHANNELS_LOAD_INTERVAL_MS = 2 * 60 * 1000;
@@ -30,6 +32,7 @@ export class MessagesProxyService implements OnModuleInit {
     private goodgameApiService: GoodgameApiService,
     private dbService: DbService,
     private peka2tvChatSdkService: Peka2tvChatSdkService,
+    private loggerService: LoggerService,
   ) {
   }
 
@@ -82,7 +85,9 @@ export class MessagesProxyService implements OnModuleInit {
     if (this.connectedChannels[channelId]) {
       return;
     }
-console.log('> join', channelId);
+
+    this.log(`join ${channelId}`, CONFIG.logging.ggChatMainEvents);
+
     this.connectedChannels[channelId] = channel;
 
     const successJoin$ = this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.successJoin).pipe(
@@ -96,7 +101,7 @@ console.log('> join', channelId);
         retry(3),
       )
       .subscribe({
-        next: () => console.log('> joined', channelId),
+        next: () => this.log(`joined ${channelId}`, CONFIG.logging.ggChatMainEvents),
         // leave on error
         error: () => {
           this.leaveChannel(channelId);
@@ -105,7 +110,8 @@ console.log('> join', channelId);
   }
 
   private leaveChannel(channelId: string): void {
-console.log('> leave', channelId);
+    this.log(`leave ${channelId}`, CONFIG.logging.ggChatMainEvents);
+
     this.removeChannel(channelId);
 
     this.chatConnectionService.leaveChannel(channelId)
@@ -113,7 +119,8 @@ console.log('> leave', channelId);
   }
 
   private removeChannel(channelId: string): void {
-console.log('> remove channel', channelId);
+    this.log(`remove channel ${channelId}`, CONFIG.logging.ggChatMainEvents);
+
     delete this.chatConnectionService[channelId];
   }
 
@@ -198,5 +205,13 @@ console.log('> remove channel', channelId);
           : throwError(null)
       ),
     );
+  }
+
+  private log(message: string, enabled: boolean): void {
+    if (!enabled) {
+      return;
+    }
+
+    this.loggerService.log(message, this.constructor.name);
   }
 }

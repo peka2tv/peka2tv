@@ -8,7 +8,7 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       port: CONFIG.port,
-    }
+    },
   });
 
   await app.listen(() => {

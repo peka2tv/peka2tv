@@ -6,6 +6,7 @@ import { TChatEvent, IChatEventMap, IChatEvent } from '../interface';
 import { take, filter, map, delay, concatAll, tap } from 'rxjs/operators';
 import { CHAT_EVENT_TYPE } from '../const';
 import { Observable, Subject, of } from 'rxjs';
+import { LoggerService } from '../../shared/service/logger';
 
 const REQUEST_SPAM_TIMEOUT_MS = 100;
 
@@ -13,6 +14,11 @@ const REQUEST_SPAM_TIMEOUT_MS = 100;
 export class ChatConnectionService implements OnModuleInit {
   private chatConnection: WebSocketSubject<TChatEvent<keyof IChatEventMap>>;
   private requestsQueue = new Subject<IChatEvent<any, any>>();
+
+  constructor(
+    private loggerService: LoggerService,
+  ) {
+  }
 
   // TODO: delay  startup until connection done
   public onModuleInit() {
@@ -26,15 +32,18 @@ export class ChatConnectionService implements OnModuleInit {
       WebSocketCtor: WebSocket,
     });
 
-    // TODO: remove after testing
     this.chatConnection.subscribe({
       next: event => {
-        if (event.type === CHAT_EVENT_TYPE.error) {
-          console.log('> event', event);
+        if (
+          CONFIG.logging.ggChatAllEvents
+          || (CONFIG.logging.ggChatMainEvents && (event.type === CHAT_EVENT_TYPE.welcome))
+          || (event.type === CHAT_EVENT_TYPE.error)
+        ) {
+          this.log(`event ${JSON.stringify(event)}`, true);
         }
       },
-      error: error => console.log('> error', error),
-      complete: () => console.log('> completed'),
+      error: error => this.log(`error ${JSON.stringify(error)}`, CONFIG.logging.ggChatMainEvents),
+      complete: () => this.log(`completed`, CONFIG.logging.ggChatMainEvents),
     });
 
     this.requestsQueue
@@ -45,11 +54,9 @@ export class ChatConnectionService implements OnModuleInit {
           )
         ),
         concatAll(),
-        tap(request => console.log('> request', request)),
+        tap(request => this.log(`request ${JSON.stringify(request)}`, CONFIG.logging.ggChatAllEvents)),
       )
       .subscribe(request => this.chatConnection.next(request));
-
-    // TODO: (?) add reconnection or just kill process
 
     return this.chatConnection.pipe(
       take(1),
@@ -82,5 +89,13 @@ export class ChatConnectionService implements OnModuleInit {
       subscriber.next();
       subscriber.complete();
     });
+  }
+
+  private log(message: string, enabled: boolean): void {
+    if (!enabled) {
+      return;
+    }
+
+    this.loggerService.log(message, this.constructor.name);
   }
 }

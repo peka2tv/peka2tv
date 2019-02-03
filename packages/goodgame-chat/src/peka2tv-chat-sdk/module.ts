@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
 import { Peka2tvChatSdkService } from './service/sdk';
+import { SharedModule } from '../shared/module';
 
 @Module({
+  imports: [
+    SharedModule,
+  ],
   providers: [
     Peka2tvChatSdkService,
   ],
