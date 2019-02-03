@@ -1,6 +1,12 @@
-import { ENV_CONFIG } from './config.env';
+import fs from 'fs';
+import path from 'path';
 
-export const DEFAULT_CONFIG = {
+const ENV_FILE_NAME = 'config.env.json';
+const ENV_FILE_PATH = process.env.NODE_ENV === 'production'
+  ? path.resolve(ENV_FILE_NAME)
+  : path.resolve(__dirname, ENV_FILE_NAME);
+
+export const defaultConfig = {
   sdk: {
     host: '127.0.0.1',
     port: 3812,
@@ -17,7 +23,16 @@ export const DEFAULT_CONFIG = {
   },
 };
 
+let envConfig: Partial<typeof defaultConfig> = {};
+
+if (fs.existsSync(ENV_FILE_PATH)) {
+  /* tslint:disable:no-var-requires */
+  envConfig = JSON.parse(
+    fs.readFileSync(ENV_FILE_PATH, 'utf8')
+  );
+}
+
 export const CONFIG = {
-  ...DEFAULT_CONFIG,
-  ...ENV_CONFIG
+  ...defaultConfig,
+  ...envConfig
 };

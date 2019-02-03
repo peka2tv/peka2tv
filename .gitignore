@@ -3,3 +3,6 @@ dist/
 node_modules/
 
 yarn-error.log
+
+# apps specific
+config.env.json

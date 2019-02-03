@@ -28,15 +28,23 @@ const WEBPACK_CONFIG = (options: IWebpackConfigOptions): webpack.Configuration =
       nodeExternals()
     ],
 
+    optimization: {
+      minimize: false,
+    },
+
     module: {
       rules: [
         { test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }
       ]
     },
 
-    optimization: {
-      minimize: false,
-    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          'NODE_ENV': JSON.stringify('production')
+        }
+      }),
+    ]
   };
 
   return config;
