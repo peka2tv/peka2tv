@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ChatConnectionService } from '../../chat-connection/service/chat-connection';
 import { CHAT_EVENT_TYPE } from '../../chat-connection/const';
-import { map, take, switchMap, filter, catchError, timeout } from 'rxjs/operators';
+import { map, take, switchMap, filter, catchError, retry } from 'rxjs/operators';
 import { IChatMessageData } from '../../chat-connection/interface';
 import { AllHtmlEntities } from 'html-entities';
 import { timer, throwError, of, Observable, forkJoin } from 'rxjs';
@@ -12,7 +12,6 @@ import { DbService } from '../../db/service/db';
 const CHANNEL_STATUS_REQUEST_TIMEOUT_MS = 5 * 1000;
 const CHANNELS_LOAD_INTERVAL_MS = 2 * 60 * 1000;
 const ENTITIES = new AllHtmlEntities();
-const JOIN_WAIT_TIMEOUT_MS = 5000;
 const HTML_URLS_REG_EXP = new RegExp('(<a[^>]*href\="([^"]*)"[^>]*>[^<]*<\/a>)', 'ig');
 const GOODGAME_CHANNEL_ID_FORMAT_REG_EXP = /^[0-9]+$/;
 const SMILES_PREFIX = 'gg-';
@@ -82,15 +81,18 @@ export class MessagesProxyService implements OnModuleInit {
 console.log('> join', channelId);
     this.connectedChannels[channelId] = channel;
 
-    this.chatConnectionService.joinChannel(channelId);
+    const successJoin$ = this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.successJoin).pipe(
+      filter(data => data.channel_id.toString() === channelId),
+      take(1),
+    );
 
-    this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.successJoin)
+    this.chatConnectionService.joinChannel(channelId)
       .pipe(
-        timeout(JOIN_WAIT_TIMEOUT_MS),
-        map(data => data.channel_id === channelId),
-        take(1),
+        switchMap(() => successJoin$),
+        retry(3),
       )
       .subscribe({
+        next: () => console.log('> joined', channelId),
         // leave on error
         error: () => {
           this.leaveChannel(channelId);
@@ -102,7 +104,8 @@ console.log('> join', channelId);
 console.log('> leave', channelId);
     this.removeChannel(channelId);
 
-    this.chatConnectionService.leaveChannel(channelId);
+    this.chatConnectionService.leaveChannel(channelId)
+      .subscribe();
   }
 
   private removeChannel(channelId: string): void {

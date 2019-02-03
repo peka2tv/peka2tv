@@ -21,7 +21,7 @@ export interface IChatJoinData {
 }
 
 export interface IChatSuccessJoinData {
-  channel_id: string;
+  channel_id: number;
 }
 
 export interface IChatLeaveData {

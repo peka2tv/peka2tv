@@ -14,7 +14,7 @@ export const defaultConfig = {
     port: 3812,
   },
   endpoints: {
-    chat: 'wss://chat-1.goodgame.ru/chat2/',
+    chat: 'wss://chat.goodgame.ru/chat/websocket',
     api: 'https://goodgame.ru/api',
   },
   db: {
