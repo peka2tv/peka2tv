@@ -7,6 +7,7 @@ const ENV_FILE_PATH = process.env.NODE_ENV === 'production'
   : path.resolve(__dirname, ENV_FILE_NAME);
 
 export const defaultConfig = {
+  port: 3900,
   sdk: {
     host: '127.0.0.1',
     port: 3812,
