@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import deepmerge from 'deepmerge';
 
 const ENV_FILE_NAME = 'config.env.json';
 const ENV_FILE_PATH = process.env.NODE_ENV === 'production'
@@ -20,7 +21,8 @@ export const defaultConfig = {
     host: 'localhost',
     user: 'root',
     password: 'vagrant',
-    database: 'sc2tv2'
+    database: 'sc2tv2',
+    connectionLimit: 10,
   },
 };
 
@@ -33,7 +35,7 @@ if (fs.existsSync(ENV_FILE_PATH)) {
   );
 }
 
-export const CONFIG = {
-  ...defaultConfig,
-  ...envConfig
-};
+export const CONFIG = deepmerge(
+  defaultConfig,
+  envConfig
+);

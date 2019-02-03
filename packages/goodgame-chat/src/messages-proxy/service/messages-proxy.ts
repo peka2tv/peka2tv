@@ -1,21 +1,23 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ChatConnectionService } from '../../chat-connection/service/chat-connection';
 import { CHAT_EVENT_TYPE } from '../../chat-connection/const';
-import { map, take, switchMapTo, switchMap, filter, catchError } from 'rxjs/operators';
-import { IChatMessageData, IChatSuccessJoinData } from '../../chat-connection/interface';
+import { map, take, switchMap, filter, catchError, timeout } from 'rxjs/operators';
+import { IChatMessageData } from '../../chat-connection/interface';
 import { AllHtmlEntities } from 'html-entities';
-import { timer, throwError, race, of, Observable, merge, forkJoin } from 'rxjs';
+import { timer, throwError, of, Observable, forkJoin } from 'rxjs';
 import { GoodgameApiService } from '../../api/service/api';
 import { IChannel } from '../interface';
+import { DbService } from '../../db/service/db';
 
-const GOODGAME_CHANNEL_ID_FORMAT_REG_EXP = /^[0-9]+$/;
 const CHANNEL_STATUS_REQUEST_TIMEOUT_MS = 5 * 1000;
 const CHANNELS_LOAD_INTERVAL_MS = 2 * 60 * 1000;
 const ENTITIES = new AllHtmlEntities();
-const JOIN_TIMEOUT_MS = 5000;
+const JOIN_WAIT_TIMEOUT_MS = 5000;
 const HTML_URLS_REG_EXP = new RegExp('(<a[^>]*href\="([^"]*)"[^>]*>[^<]*<\/a>)', 'ig');
+const GOODGAME_CHANNEL_ID_FORMAT_REG_EXP = /^[0-9]+$/;
 const SMILES_PREFIX = 'gg-';
 const SMILES_REG_EXP = new RegExp('(:[a-zA-Z0-9_]+:)', 'g');
+const STREAM_GOODGAME_PROVIDER = 'goodgame.ru';
 
 @Injectable()
 export class MessagesProxyService implements OnModuleInit {
@@ -24,6 +26,7 @@ export class MessagesProxyService implements OnModuleInit {
   constructor(
     private chatConnectionService: ChatConnectionService,
     private goodgameApiService: GoodgameApiService,
+    private dbService: DbService,
   ) {
   }
 
@@ -53,7 +56,6 @@ export class MessagesProxyService implements OnModuleInit {
   }
 
   private processChannels(channels: IChannel[]): void {
-console.log('> channels', channels);
     // join new online channels
     channels.forEach(channel => {
       if (this.connectedChannels[channel.ggChannelId]) {
@@ -82,15 +84,9 @@ console.log('> join', channelId);
 
     this.chatConnectionService.joinChannel(channelId);
 
-    const timeout$ = timer(JOIN_TIMEOUT_MS).pipe(
-      switchMapTo<IChatSuccessJoinData>(throwError(null)),
-    );
-
-    race(
-      timeout$,
-      this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.successJoin)
-    )
+    this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.successJoin)
       .pipe(
+        timeout(JOIN_WAIT_TIMEOUT_MS),
         map(data => data.channel_id === channelId),
         take(1),
       )
@@ -146,20 +142,23 @@ console.log('> remove channel', channelId);
   }
 
   private loadActiveStreamsFromDb(): Observable<IChannel[]> {
-    return merge(
-      of([
-        { ggChannelId: '3857', streamerId: 123 },
-        { ggChannelId: '26967', streamerId: 123 },
-        { ggChannelId: 'primetime', streamerId: 123 },
-      ]),
-      timer(10000).pipe(
-        map(() => [
-          { ggChannelId: '16232', streamerId: 123 },
-          { ggChannelId: '7692', streamerId: 123 },
-          { ggChannelId: 'primetime', streamerId: 123 },
-        ])
-      ),
-    );
+    const query = `
+      SELECT
+        stream_player.channel AS ggChannelId, stream.user_id AS streamerId
+      FROM
+        stream_player
+        JOIN stream ON stream.user_id = stream_player.user_id
+      WHERE
+        stream.active = 1
+        AND stream_player.active = 1
+        AND stream_player.provider = ?
+    `;
+
+    const data = [
+      STREAM_GOODGAME_PROVIDER,
+    ];
+
+    return this.dbService.query<IChannel[]>(query, data);
   }
 
   private normalizeChannelId(channel: IChannel): Observable<IChannel | null> {
