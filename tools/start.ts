@@ -15,4 +15,4 @@ if (!projectName) {
   process.exit(0);
 }
 
-run(`yarn ts-node ${serviceEntryPoint} ${argumentsString}`);
+run(`yarn ts-node -r tsconfig-paths/register ${serviceEntryPoint} ${argumentsString}`);

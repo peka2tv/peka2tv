@@ -2,6 +2,7 @@ import webpack from 'webpack';
 import path from 'path';
 /* tslint:disable:no-var-requires */
 const nodeExternals = require('webpack-node-externals');
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 
 export interface IWebpackConfigOptions {
   entry: string;
@@ -22,10 +23,13 @@ const WEBPACK_CONFIG = (options: IWebpackConfigOptions): webpack.Configuration =
 
     resolve: {
       extensions: [ '.ts', '.js' ],
+      plugins: [
+        new TsconfigPathsPlugin(),
+      ],
     },
     externals: [
       path.resolve(__dirname, '../node_modules'),
-      nodeExternals()
+      nodeExternals(),
     ],
 
     optimization: {
@@ -34,20 +38,20 @@ const WEBPACK_CONFIG = (options: IWebpackConfigOptions): webpack.Configuration =
 
     module: {
       rules: [
-        { test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }
-      ]
+        { test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ },
+      ],
     },
 
     plugins: [
       new webpack.DefinePlugin({
         'process.env': {
-          'NODE_ENV': JSON.stringify('production')
-        }
+          NODE_ENV: JSON.stringify('production'),
+        },
       }),
-    ]
+    ],
   };
 
   return config;
-}
+};
 
 export default WEBPACK_CONFIG;

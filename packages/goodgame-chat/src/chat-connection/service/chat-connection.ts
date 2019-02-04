@@ -6,7 +6,7 @@ import { TChatEvent, IChatEventMap, IChatEvent } from '../interface';
 import { take, filter, map, delay, concatAll, tap } from 'rxjs/operators';
 import { CHAT_EVENT_TYPE } from '../const';
 import { Observable, Subject, of } from 'rxjs';
-import { BasicLogger } from '../../shared/logger';
+import { BasicLogger } from '@peka2tv/libs/core/logger';
 
 const REQUEST_SPAM_TIMEOUT_MS = 100;
 
@@ -14,7 +14,7 @@ const REQUEST_SPAM_TIMEOUT_MS = 100;
 export class ChatConnectionService implements OnModuleInit {
   private chatConnection: WebSocketSubject<TChatEvent<keyof IChatEventMap>>;
   private requestsQueue = new Subject<IChatEvent<any, any>>();
-  private logger = new BasicLogger(this.constructor.name);
+  private logger = new BasicLogger(this.constructor.name, CONFIG.logging.enabled);
 
   // TODO: delay  startup until connection done
   public onModuleInit() {

@@ -1,16 +1,16 @@
 import { Logger as NestjsLogger } from '@nestjs/common';
-import { CONFIG } from '../config/config';
 
 export class BasicLogger {
   private nestjsLogger = new NestjsLogger();
 
   constructor(
     private context: string,
+    private enabled = true,
   ) {
   }
 
   public log(message: any, enabled: boolean): void {
-    if (!enabled || !CONFIG.logging.enabled) {
+    if (!enabled || !this.enabled) {
       return;
     }
 

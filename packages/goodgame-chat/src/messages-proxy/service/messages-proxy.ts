@@ -4,14 +4,13 @@ import { CHAT_EVENT_TYPE } from '../../chat-connection/const';
 import { map, take, switchMap, filter, catchError, retry } from 'rxjs/operators';
 import { IChatMessageData } from '../../chat-connection/interface';
 import { AllHtmlEntities } from 'html-entities';
-import { timer, throwError, of, Observable, forkJoin } from 'rxjs';
+import { timer, throwError, of, Observable, forkJoin, interval } from 'rxjs';
 import { GoodgameApiService } from '../../api/service/api';
 import { IChannel, IStreamChannel } from '../interface';
-import { DbService } from '../../db/service/db';
-import { Peka2tvChatSdkService } from '../../peka2tv-chat-sdk/service/sdk';
-import { IPeka2tvChatNewMessage } from '../../peka2tv-chat-sdk/interface';
 import { CONFIG } from '../../config/config';
-import { BasicLogger } from '../../shared/logger';
+import { DbService } from '@peka2tv/libs/db';
+import { BasicLogger } from '@peka2tv/libs/core/logger';
+import { Peka2tvChatSdkService, IPeka2tvChatNewMessage } from '@peka2tv/libs/peka2tv-chat-sdk';
 
 const CHANNEL_STATUS_REQUEST_TIMEOUT_MS = 5 * 1000;
 const CHANNELS_LOAD_INTERVAL_MS = 2 * 60 * 1000;
@@ -21,12 +20,19 @@ const GOODGAME_CHANNEL_ID_FORMAT_REG_EXP = /^[0-9]+$/;
 const PEKA2TV_CHANNEL_PREFIX = 'goodgame.ru/';
 const SMILES_PREFIX = 'gg-';
 const SMILES_REG_EXP = new RegExp('(:[a-zA-Z0-9_]+:)', 'g');
+const STATISTIC_LOGGING_INTERVAL_MS = 1 * 60 * 1000;
 const STREAM_GOODGAME_PROVIDER = 'goodgame.ru';
+
+const EMPTY_STATISTIC = {
+  joinedChannels: 0,
+  peka2tvMessageSent: 0,
+};
 
 @Injectable()
 export class MessagesProxyService implements OnModuleInit {
   private connectedChannels: Record<string, IChannel> = {};
-  private logger = new BasicLogger(this.constructor.name);
+  private logger = new BasicLogger(this.constructor.name, CONFIG.logging.enabled);
+  private statistic = EMPTY_STATISTIC;
 
   constructor(
     private chatConnectionService: ChatConnectionService,
@@ -42,6 +48,8 @@ export class MessagesProxyService implements OnModuleInit {
 
     this.listenNewChannels();
 
+    interval(STATISTIC_LOGGING_INTERVAL_MS)
+      .subscribe(() => this.logStatistic());
   }
 
   private listenLeavedChannels() {
@@ -167,9 +175,11 @@ export class MessagesProxyService implements OnModuleInit {
           ),
         ),
       )
-      .subscribe(messages =>
-        messages.forEach(message => this.peka2tvChatSdkService.send(message)),
-      );
+      .subscribe(messages => {
+        messages.forEach(message => this.peka2tvChatSdkService.send(message));
+
+        this.statistic.peka2tvMessageSent += messages.length;
+      });
   }
 
   private formatMessage(message: IChatMessageData, streamerId: number): IPeka2tvChatNewMessage {
@@ -242,5 +252,15 @@ export class MessagesProxyService implements OnModuleInit {
           : throwError(null),
       ),
     );
+  }
+
+  private logStatistic(): void {
+    this.statistic.joinedChannels = Object.keys(this.connectedChannels)
+      .filter(ggChannelId => this.connectedChannels[ggChannelId].joined)
+      .length;
+
+    this.logger.log(`statistic: ${JSON.stringify(this.statistic)}`, CONFIG.logging.ggChatMainEvents);
+
+    this.statistic = { ...EMPTY_STATISTIC };
   }
 }
