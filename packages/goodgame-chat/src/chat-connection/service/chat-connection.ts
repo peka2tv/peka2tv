@@ -6,7 +6,7 @@ import { TChatEvent, IChatEventMap, IChatEvent } from '../interface';
 import { take, filter, map, delay, concatAll, tap } from 'rxjs/operators';
 import { CHAT_EVENT_TYPE } from '../const';
 import { Observable, Subject, of } from 'rxjs';
-import { LoggerService } from '../../shared/service/logger';
+import { BasicLogger } from '../../shared/logger';
 
 const REQUEST_SPAM_TIMEOUT_MS = 100;
 
@@ -14,11 +14,7 @@ const REQUEST_SPAM_TIMEOUT_MS = 100;
 export class ChatConnectionService implements OnModuleInit {
   private chatConnection: WebSocketSubject<TChatEvent<keyof IChatEventMap>>;
   private requestsQueue = new Subject<IChatEvent<any, any>>();
-
-  constructor(
-    private loggerService: LoggerService,
-  ) {
-  }
+  private logger = new BasicLogger(this.constructor.name);
 
   // TODO: delay  startup until connection done
   public onModuleInit() {
@@ -39,11 +35,11 @@ export class ChatConnectionService implements OnModuleInit {
           || (CONFIG.logging.ggChatMainEvents && (event.type === CHAT_EVENT_TYPE.welcome))
           || (event.type === CHAT_EVENT_TYPE.error)
         ) {
-          this.log(`event ${JSON.stringify(event)}`, true);
+          this.logger.log(`event ${JSON.stringify(event)}`, true);
         }
       },
-      error: error => this.log(`error ${JSON.stringify(error)}`, CONFIG.logging.ggChatMainEvents),
-      complete: () => this.log(`completed`, CONFIG.logging.ggChatMainEvents),
+      error: error => this.logger.log(`error ${JSON.stringify(error)}`, CONFIG.logging.ggChatMainEvents),
+      complete: () => this.logger.log(`completed`, CONFIG.logging.ggChatMainEvents),
     });
 
     this.requestsQueue
@@ -54,7 +50,7 @@ export class ChatConnectionService implements OnModuleInit {
           ),
         ),
         concatAll(),
-        tap(request => this.log(`request ${JSON.stringify(request)}`, CONFIG.logging.ggChatAllEvents)),
+        tap(request => this.logger.log(`request ${JSON.stringify(request)}`, CONFIG.logging.ggChatAllEvents)),
       )
       .subscribe(request => this.chatConnection.next(request));
 
@@ -89,13 +85,5 @@ export class ChatConnectionService implements OnModuleInit {
       subscriber.next();
       subscriber.complete();
     });
-  }
-
-  private log(message: string, enabled: boolean): void {
-    if (!enabled) {
-      return;
-    }
-
-    this.loggerService.log(message, this.constructor.name);
   }
 }

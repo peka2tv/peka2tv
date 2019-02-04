@@ -1,4 +1,10 @@
 export interface IChannel {
-  streamerId: number;
   ggChannelId: string;
+  streamerIds: number[];
+  joined: boolean;
+}
+
+export interface IStreamChannel {
+  ggChannelId: string;
+  streamerId: number;
 }

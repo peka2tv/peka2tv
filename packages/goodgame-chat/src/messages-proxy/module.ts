@@ -4,7 +4,6 @@ import { MessagesProxyService } from './service/messages-proxy';
 import { GoodgameApiModule } from '../api/module';
 import { DbModule } from '../db/module';
 import { Peka2tvChatSdkModule } from '../peka2tv-chat-sdk/module';
-import { SharedModule } from '../shared/module';
 
 @Module({
   imports: [
@@ -12,7 +11,6 @@ import { SharedModule } from '../shared/module';
     GoodgameApiModule,
     DbModule,
     Peka2tvChatSdkModule,
-    SharedModule,
   ],
   providers: [
     MessagesProxyService,
