@@ -1,15 +1,21 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { createPool, Pool } from 'mysql';
-import { CONFIG } from '../../config/config';
 import { Observable } from 'rxjs';
+import { IDbConfig } from '../interface';
+import { DB_CONFIG_TOKEN } from '../const';
 
 @Injectable()
 export class DbService implements OnModuleInit {
   private pool: Pool;
 
+  constructor(
+    @Inject(DB_CONFIG_TOKEN) private dbConfig: IDbConfig,
+  ) {
+  }
+
   public onModuleInit(): void {
     this.pool = createPool({
-      ...CONFIG.db,
+      ...this.dbConfig,
     });
   }
 

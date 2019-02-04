@@ -1,17 +1,18 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CONFIG } from '../../config/config';
-import { IPeka2tvChatNewMessage } from '../interface';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
+import { IPeka2tvChatNewMessage, IPeka2tvSdkConfig } from '../interface';
 import io from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { LoggerService } from '../../shared/service/logger';
+import { BasicLogger } from '@peka2tv/libs/core/logger';
+import { PEKA2TV_SDK_CONFIG } from '../const';
 
 @Injectable()
 export class Peka2tvChatSdkService implements OnModuleInit {
   private sdkConnection: SocketIOClient.Socket;
+  private logger = new BasicLogger(this.constructor.name, this.sdkConfig.logging.enabled);
 
   constructor(
-    private loggerService: LoggerService,
+    @Inject(PEKA2TV_SDK_CONFIG) private sdkConfig: IPeka2tvSdkConfig,
   ) {
   }
 
@@ -22,21 +23,21 @@ export class Peka2tvChatSdkService implements OnModuleInit {
 
   public connect(
   ) {
-    this.sdkConnection = io.connect(CONFIG.sdk.url, {
+    this.sdkConnection = io.connect(this.sdkConfig.url, {
       transports: ['websocket'],
       reconnectionDelay: 500,
       reconnectionDelayMax: 2000,
-      reconnectionAttempts: Infinity
+      reconnectionAttempts: Infinity,
     });
 
     this.onEvent('connect')
-      .subscribe(() => this.log('sdk connected', CONFIG.logging.peka2tvSdkMainEvents));
+      .subscribe(() => this.logger.log('sdk connected', this.sdkConfig.logging.main));
 
     this.onEvent<any>('error')
-      .subscribe(error => this.log(`sdk error ${JSON.stringify(error)}`, CONFIG.logging.peka2tvSdkMainEvents));
+      .subscribe(error => this.logger.log(`sdk error ${JSON.stringify(error)}`, this.sdkConfig.logging.main));
 
     this.onEvent('disconnect')
-      .subscribe(() => this.log('sdk disconnect', CONFIG.logging.peka2tvSdkMainEvents));
+      .subscribe(() => this.logger.log('sdk disconnect', this.sdkConfig.logging.main));
 
     return this.onEvent('connect').pipe(
       take(1),
@@ -54,16 +55,8 @@ export class Peka2tvChatSdkService implements OnModuleInit {
   }
 
   public send(message: IPeka2tvChatNewMessage): void {
-    this.log(`send ${JSON.stringify(message)}`, CONFIG.logging.peka2tvSdkAllEvents);
+    this.logger.log(`send ${JSON.stringify(message)}`, this.sdkConfig.logging.all);
 
     this.sdkConnection.emit('/sdk/publish', message);
-  }
-
-  private log(message: string, enabled: boolean): void {
-    if (!enabled) {
-      return;
-    }
-
-    this.loggerService.log(message, this.constructor.name);
   }
 }

@@ -10,7 +10,7 @@ const WEBPACK_CONFIG = 'tools/webpack.config.ts';
 const DIST_FOLDER = 'deploy/dist';
 
 const projectName = PROJECT_DIRECTORY.slice(
-  PROJECT_DIRECTORY.indexOf(PACKAGES_FOLDER_NAME) + PACKAGES_FOLDER_NAME.length + 1
+  PROJECT_DIRECTORY.indexOf(PACKAGES_FOLDER_NAME) + PACKAGES_FOLDER_NAME.length + 1,
 );
 
 if (!projectName) {
@@ -18,11 +18,9 @@ if (!projectName) {
   process.exit(0);
 }
 
-
 createJsBundle();
 createBinary();
 cleanup();
-
 
 function createJsBundle(): void {
   console.log(`(~) (${projectName}) creating js bundle`);

@@ -1,3 +1,12 @@
+export interface IPeka2tvSdkConfig {
+  url: string;
+  logging: {
+    enabled: boolean,
+    main: boolean;
+    all: boolean;
+  };
+}
+
 export interface IPeka2tvChatUser {
   id: number;
   name: string;
