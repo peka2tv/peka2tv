@@ -35,6 +35,7 @@
     "no-submodule-imports": [ true, "rxjs" ],
     "no-implicit-dependencies": false,
     "ban-types": false,
-    "array-type": false
+    "array-type": false,
+    "arrow-parens": false
   }
 }

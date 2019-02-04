@@ -18,8 +18,8 @@ export class GoodgameApiService {
         `${this.endpoint}/getchannelstatus`,
         {
           params: { fmt: 'json', id },
-          timeout
-        }
+          timeout,
+        },
       )
       .pipe(
         map(({ data }) => data),

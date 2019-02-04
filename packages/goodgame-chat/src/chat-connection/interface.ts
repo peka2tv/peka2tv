@@ -52,4 +52,3 @@ export interface IChatEventMap {
 }
 
 export type TChatEvent<T extends keyof IChatEventMap> = IChatEvent<T, IChatEventMap[T]>;
-

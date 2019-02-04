@@ -50,8 +50,8 @@ export class ChatConnectionService implements OnModuleInit {
       .pipe(
         map(request =>
           of(request).pipe(
-            delay(REQUEST_SPAM_TIMEOUT_MS)
-          )
+            delay(REQUEST_SPAM_TIMEOUT_MS),
+          ),
         ),
         concatAll(),
         tap(request => this.log(`request ${JSON.stringify(request)}`, CONFIG.logging.ggChatAllEvents)),
@@ -72,13 +72,13 @@ export class ChatConnectionService implements OnModuleInit {
 
   public joinChannel(channelId: string): Observable<void> {
     return this.sendEvent(CHAT_EVENT_TYPE.join, {
-      channel_id: channelId
+      channel_id: channelId,
     });
   }
 
   public leaveChannel(channelId: string): Observable<void> {
     return this.sendEvent(CHAT_EVENT_TYPE.leave, {
-      channel_id: channelId
+      channel_id: channelId,
     });
   }
 

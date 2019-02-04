@@ -7,7 +7,7 @@ import { LoggerService } from './service/logger';
   ],
   exports: [
     LoggerService,
-  ]
+  ],
 })
 export class SharedModule {
 }

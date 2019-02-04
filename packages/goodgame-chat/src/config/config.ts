@@ -37,11 +37,11 @@ let envConfig: Partial<typeof defaultConfig> = {};
 if (fs.existsSync(ENV_FILE_PATH)) {
   /* tslint:disable:no-var-requires */
   envConfig = JSON.parse(
-    fs.readFileSync(ENV_FILE_PATH, 'utf8')
+    fs.readFileSync(ENV_FILE_PATH, 'utf8'),
   );
 }
 
 export const CONFIG = deepmerge(
   defaultConfig,
-  envConfig
+  envConfig,
 );

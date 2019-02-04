@@ -158,10 +158,10 @@ export class MessagesProxyService implements OnModuleInit {
     return this.loadActiveStreamsFromDb().pipe(
       switchMap(channels =>
         forkJoin(
-          channels.map(channel => this.normalizeChannelId(channel))
-        )
+          channels.map(channel => this.normalizeChannelId(channel)),
+        ),
       ),
-      map(channels=> channels.filter((channel): channel is IChannel => !!channel))
+      map(channels => channels.filter((channel): channel is IChannel => !!channel)),
     );
   }
 
@@ -193,7 +193,7 @@ export class MessagesProxyService implements OnModuleInit {
     return this.getStreamIdFromChannelName(channel.ggChannelId).pipe(
       map(ggChannelId => ({ ...channel, ggChannelId })),
       catchError(() => of(null)),
-    )
+    );
   }
 
   private getStreamIdFromChannelName(name: string): Observable<string> {
@@ -202,7 +202,7 @@ export class MessagesProxyService implements OnModuleInit {
       switchMap(stream =>
         stream
           ? of(stream.stream_id)
-          : throwError(null)
+          : throwError(null),
       ),
     );
   }

@@ -26,7 +26,7 @@ export class Peka2tvChatSdkService implements OnModuleInit {
       transports: ['websocket'],
       reconnectionDelay: 500,
       reconnectionDelayMax: 2000,
-      reconnectionAttempts: Infinity
+      reconnectionAttempts: Infinity,
     });
 
     this.onEvent('connect')
