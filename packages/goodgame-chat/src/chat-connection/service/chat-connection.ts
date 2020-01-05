@@ -61,7 +61,7 @@ export class ChatConnectionService implements OnModuleInit {
 
   public onEvent<T extends keyof IChatEventMap>(type: T): Observable<IChatEventMap[T]> {
     return this.chatConnection.pipe(
-      filter((event) => event.type === type),
+      filter((event): event is TChatEvent<T> => event.type === type),
       map(({ data }) => data),
     );
   }

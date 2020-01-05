@@ -45,7 +45,7 @@ function createBinary(): void {
 
   const platform = getBinaryTargetPlatform();
 
-  const target = `node8-${platform}-x64`;
+  const target = `node10-${platform}-x64`;
   const jsBundleFile = getJsBundlePath();
   const binaryFile = path.resolve(PROJECT_DIRECTORY, DIST_FOLDER, projectName);
 
