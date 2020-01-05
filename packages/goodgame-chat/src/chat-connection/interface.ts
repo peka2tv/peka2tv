@@ -42,13 +42,13 @@ export interface IChatMessageData {
 }
 
 export interface IChatEventMap {
-  [ CHAT_EVENT_TYPE.welcome ]: IChatWelcomeData;
-  [ CHAT_EVENT_TYPE.error ]: IChatErrorData;
-  [ CHAT_EVENT_TYPE.join ]: IChatJoinData;
-  [ CHAT_EVENT_TYPE.successJoin ]: IChatSuccessJoinData;
-  [ CHAT_EVENT_TYPE.leave ]: IChatLeaveData;
-  [ CHAT_EVENT_TYPE.successLeave ]: IChatSuccessLeaveData;
-  [ CHAT_EVENT_TYPE.message ]: IChatMessageData;
+  [CHAT_EVENT_TYPE.welcome]: IChatWelcomeData;
+  [CHAT_EVENT_TYPE.error]: IChatErrorData;
+  [CHAT_EVENT_TYPE.join]: IChatJoinData;
+  [CHAT_EVENT_TYPE.successJoin]: IChatSuccessJoinData;
+  [CHAT_EVENT_TYPE.leave]: IChatLeaveData;
+  [CHAT_EVENT_TYPE.successLeave]: IChatSuccessLeaveData;
+  [CHAT_EVENT_TYPE.message]: IChatMessageData;
 }
 
 export type TChatEvent<T extends keyof IChatEventMap> = IChatEvent<T, IChatEventMap[T]>;

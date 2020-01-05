@@ -1,39 +1,39 @@
 {
-  "extends": [
-    "tslint:latest",
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint:latest", "tslint-config-prettier"],
   "rules": {
-    "member-ordering": [ true, {
-      "order": [
-        "public-static-field",
-        "public-static-method",
-        "protected-static-field",
-        "protected-static-method",
-        "private-static-field",
-        "private-static-method",
+    "member-ordering": [
+      true,
+      {
+        "order": [
+          "public-static-field",
+          "public-static-method",
+          "protected-static-field",
+          "protected-static-method",
+          "private-static-field",
+          "private-static-method",
 
-        "public-instance-field",
-        "protected-instance-field",
-        "private-instance-field",
+          "public-instance-field",
+          "protected-instance-field",
+          "private-instance-field",
 
-        "public-constructor",
-        "protected-constructor",
-        "private-constructor",
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
 
-        "public-instance-method",
-        "protected-instance-method",
-        "private-instance-method"
-      ]
-    }],
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ]
+      }
+    ],
     "no-console": false,
-    "quotemark": [ true, "single" ],
+    "quotemark": [true, "single"],
     "object-literal-sort-keys": false,
     "variable-name": false,
     "no-empty": false,
     "ordered-imports": false,
     "no-empty-interface": false,
-    "no-submodule-imports": [ true, "rxjs", "@peka2tv/libs" ],
+    "no-submodule-imports": [true, "rxjs", "@peka2tv/libs"],
     "no-implicit-dependencies": false,
     "ban-types": false,
     "array-type": false,

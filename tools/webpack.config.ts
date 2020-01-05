@@ -22,24 +22,17 @@ const WEBPACK_CONFIG = (options: IWebpackConfigOptions): webpack.Configuration =
     },
 
     resolve: {
-      extensions: [ '.ts', '.js' ],
-      plugins: [
-        new TsconfigPathsPlugin(),
-      ],
+      extensions: ['.ts', '.js'],
+      plugins: [new TsconfigPathsPlugin()],
     },
-    externals: [
-      path.resolve(__dirname, '../node_modules'),
-      nodeExternals(),
-    ],
+    externals: [path.resolve(__dirname, '../node_modules'), nodeExternals()],
 
     optimization: {
       minimize: false,
     },
 
     module: {
-      rules: [
-        { test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ },
-      ],
+      rules: [{ test: /\.ts$/, use: 'ts-loader', exclude: /node_modules/ }],
     },
 
     plugins: [

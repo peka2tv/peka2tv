@@ -8,10 +8,7 @@ import { DB_CONFIG_TOKEN } from '../const';
 export class DbService implements OnModuleInit {
   private pool: Pool;
 
-  constructor(
-    @Inject(DB_CONFIG_TOKEN) private dbConfig: IDbConfig,
-  ) {
-  }
+  constructor(@Inject(DB_CONFIG_TOKEN) private dbConfig: IDbConfig) {}
 
   public onModuleInit(): void {
     this.pool = createPool({

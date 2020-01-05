@@ -15,7 +15,7 @@ import { Peka2tvChatSdkService, IPeka2tvChatNewMessage } from '@peka2tv/libs/pek
 const CHANNEL_STATUS_REQUEST_TIMEOUT_MS = 5 * 1000;
 const CHANNELS_LOAD_INTERVAL_MS = 2 * 60 * 1000;
 const ENTITIES = new AllHtmlEntities();
-const HTML_URLS_REG_EXP = new RegExp('(<a[^>]*href\="([^"]*)"[^>]*>[^<]*<\/a>)', 'ig');
+const HTML_URLS_REG_EXP = new RegExp('(<a[^>]*href="([^"]*)"[^>]*>[^<]*</a>)', 'ig');
 const GOODGAME_CHANNEL_ID_FORMAT_REG_EXP = /^[0-9]+$/;
 const PEKA2TV_CHANNEL_PREFIX = 'goodgame.ru/';
 const SMILES_PREFIX = 'gg-';
@@ -39,8 +39,7 @@ export class MessagesProxyService implements OnModuleInit {
     private goodgameApiService: GoodgameApiService,
     private dbService: DbService,
     private peka2tvChatSdkService: Peka2tvChatSdkService,
-  ) {
-  }
+  ) {}
 
   public onModuleInit() {
     this.listenChannelsMessages();
@@ -48,13 +47,13 @@ export class MessagesProxyService implements OnModuleInit {
 
     this.listenNewChannels();
 
-    interval(STATISTIC_LOGGING_INTERVAL_MS)
-      .subscribe(() => this.logStatistic());
+    interval(STATISTIC_LOGGING_INTERVAL_MS).subscribe(() => this.logStatistic());
   }
 
   private listenLeavedChannels() {
     // clean up leaved channels
-    this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.successLeave)
+    this.chatConnectionService
+      .onEvent(CHAT_EVENT_TYPE.successLeave)
       .pipe(filter(data => !!this.connectedChannels[data.channel_id]))
       .subscribe(data => {
         this.removeChannel(data.channel_id);
@@ -63,9 +62,7 @@ export class MessagesProxyService implements OnModuleInit {
 
   private listenNewChannels(): void {
     timer(0, CHANNELS_LOAD_INTERVAL_MS)
-      .pipe(
-        switchMap(() => this.loadActiveChannels()),
-      )
+      .pipe(switchMap(() => this.loadActiveChannels()))
       .subscribe(channels => this.processChannels(channels));
   }
 
@@ -135,7 +132,8 @@ export class MessagesProxyService implements OnModuleInit {
       take(1),
     );
 
-    this.chatConnectionService.joinChannel(ggChannelId)
+    this.chatConnectionService
+      .joinChannel(ggChannelId)
       .pipe(
         switchMap(() => successJoin$),
         retry(3),
@@ -154,8 +152,7 @@ export class MessagesProxyService implements OnModuleInit {
 
     this.removeChannel(channelId);
 
-    this.chatConnectionService.leaveChannel(channelId)
-      .subscribe();
+    this.chatConnectionService.leaveChannel(channelId).subscribe();
   }
 
   private removeChannel(channelId: string): void {
@@ -165,15 +162,12 @@ export class MessagesProxyService implements OnModuleInit {
   }
 
   private listenChannelsMessages(): void {
-    this.chatConnectionService.onEvent(CHAT_EVENT_TYPE.message)
+    this.chatConnectionService
+      .onEvent(CHAT_EVENT_TYPE.message)
       .pipe(
         map(message => ({ message, channel: this.connectedChannels[message.channel_id] })),
         filter(({ channel }) => !!channel),
-        map(({ message, channel }) =>
-          channel.streamerIds.map(streamerId =>
-            this.formatMessage(message, streamerId),
-          ),
-        ),
+        map(({ message, channel }) => channel.streamerIds.map(streamerId => this.formatMessage(message, streamerId))),
       )
       .subscribe(messages => {
         messages.forEach(message => this.peka2tvChatSdkService.send(message));
@@ -203,11 +197,7 @@ export class MessagesProxyService implements OnModuleInit {
 
   private loadActiveChannels(): Observable<IStreamChannel[]> {
     return this.loadActiveStreamsFromDb().pipe(
-      switchMap(channels =>
-        forkJoin(
-          channels.map(channel => this.normalizeChannelId(channel)),
-        ),
-      ),
+      switchMap(channels => forkJoin(channels.map(channel => this.normalizeChannelId(channel)))),
       map(channels => channels.filter((channel): channel is IStreamChannel => !!channel)),
     );
   }
@@ -225,9 +215,7 @@ export class MessagesProxyService implements OnModuleInit {
         AND stream_player.provider = ?
     `;
 
-    const data = [
-      STREAM_GOODGAME_PROVIDER,
-    ];
+    const data = [STREAM_GOODGAME_PROVIDER];
 
     return this.dbService.query<IStreamChannel[]>(query, data);
   }
@@ -246,18 +234,14 @@ export class MessagesProxyService implements OnModuleInit {
   private getStreamIdFromChannelName(name: string): Observable<string> {
     return this.goodgameApiService.getChannelStatus(name, CHANNEL_STATUS_REQUEST_TIMEOUT_MS).pipe(
       map(data => data[Object.keys(data)[0]]),
-      switchMap(stream =>
-        stream
-          ? of(stream.stream_id)
-          : throwError(null),
-      ),
+      switchMap(stream => (stream ? of(stream.stream_id) : throwError(null))),
     );
   }
 
   private logStatistic(): void {
-    this.statistic.joinedChannels = Object.keys(this.connectedChannels)
-      .filter(ggChannelId => this.connectedChannels[ggChannelId].joined)
-      .length;
+    this.statistic.joinedChannels = Object.keys(this.connectedChannels).filter(
+      ggChannelId => this.connectedChannels[ggChannelId].joined,
+    ).length;
 
     this.logger.log(`statistic: ${JSON.stringify(this.statistic)}`, CONFIG.logging.ggChatMainEvents);
 

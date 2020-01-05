@@ -11,18 +11,14 @@ export class Peka2tvChatSdkService implements OnModuleInit {
   private sdkConnection: SocketIOClient.Socket;
   private logger = new BasicLogger(this.constructor.name, this.sdkConfig.logging.enabled);
 
-  constructor(
-    @Inject(PEKA2TV_SDK_CONFIG) private sdkConfig: IPeka2tvSdkConfig,
-  ) {
-  }
+  constructor(@Inject(PEKA2TV_SDK_CONFIG) private sdkConfig: IPeka2tvSdkConfig) {}
 
   // TODO: delay  startup until connection done
   public onModuleInit() {
     return this.connect();
   }
 
-  public connect(
-  ) {
+  public connect() {
     this.sdkConnection = io.connect(this.sdkConfig.url, {
       transports: ['websocket'],
       reconnectionDelay: 500,
@@ -30,18 +26,15 @@ export class Peka2tvChatSdkService implements OnModuleInit {
       reconnectionAttempts: Infinity,
     });
 
-    this.onEvent('connect')
-      .subscribe(() => this.logger.log('sdk connected', this.sdkConfig.logging.main));
+    this.onEvent('connect').subscribe(() => this.logger.log('sdk connected', this.sdkConfig.logging.main));
 
-    this.onEvent<any>('error')
-      .subscribe(error => this.logger.log(`sdk error ${JSON.stringify(error)}`, this.sdkConfig.logging.main));
-
-    this.onEvent('disconnect')
-      .subscribe(() => this.logger.log('sdk disconnect', this.sdkConfig.logging.main));
-
-    return this.onEvent('connect').pipe(
-      take(1),
+    this.onEvent<any>('error').subscribe(error =>
+      this.logger.log(`sdk error ${JSON.stringify(error)}`, this.sdkConfig.logging.main),
     );
+
+    this.onEvent('disconnect').subscribe(() => this.logger.log('sdk disconnect', this.sdkConfig.logging.main));
+
+    return this.onEvent('connect').pipe(take(1));
   }
 
   public onEvent<T = void>(event: string): Observable<T> {

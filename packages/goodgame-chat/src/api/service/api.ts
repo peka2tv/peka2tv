@@ -8,21 +8,14 @@ import { map } from 'rxjs/operators';
 export class GoodgameApiService {
   private endpoint = CONFIG.endpoints.api;
 
-  constructor(
-    private httpService: HttpService,
-  ) {
-  }
+  constructor(private httpService: HttpService) {}
 
   public getChannelStatus(id: string, timeout?: number): Observable<Record<string, IChannelStatus>> {
-    return this.httpService.get<Record<string, IChannelStatus>>(
-        `${this.endpoint}/getchannelstatus`,
-        {
-          params: { fmt: 'json', id },
-          timeout,
-        },
-      )
-      .pipe(
-        map(({ data }) => data),
-      );
+    return this.httpService
+      .get<Record<string, IChannelStatus>>(`${this.endpoint}/getchannelstatus`, {
+        params: { fmt: 'json', id },
+        timeout,
+      })
+      .pipe(map(({ data }) => data));
   }
 }

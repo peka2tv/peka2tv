@@ -20,13 +20,8 @@ import { Peka2tvChatSdkModule } from '@peka2tv/libs/peka2tv-chat-sdk';
       },
     }),
   ],
-  providers: [
-    MessagesProxyService,
-  ],
+  providers: [MessagesProxyService],
 })
 export class MessagesProxyModule {
-  constructor(
-    _messagesProxyService: MessagesProxyService,
-  ) {
-  }
+  constructor(_messagesProxyService: MessagesProxyService) {}
 }

@@ -21,8 +21,7 @@ export class ChatConnectionService implements OnModuleInit {
     return this.connect();
   }
 
-  public connect(
-  ) {
+  public connect() {
     this.chatConnection = webSocket<TChatEvent<keyof IChatEventMap>>({
       url: CONFIG.endpoints.chat,
       WebSocketCtor: WebSocket,
@@ -31,9 +30,9 @@ export class ChatConnectionService implements OnModuleInit {
     this.chatConnection.subscribe({
       next: event => {
         if (
-          CONFIG.logging.ggChatAllEvents
-          || (CONFIG.logging.ggChatMainEvents && (event.type === CHAT_EVENT_TYPE.welcome))
-          || (event.type === CHAT_EVENT_TYPE.error)
+          CONFIG.logging.ggChatAllEvents ||
+          (CONFIG.logging.ggChatMainEvents && event.type === CHAT_EVENT_TYPE.welcome) ||
+          event.type === CHAT_EVENT_TYPE.error
         ) {
           this.logger.log(`event ${JSON.stringify(event)}`, true);
         }
@@ -44,19 +43,13 @@ export class ChatConnectionService implements OnModuleInit {
 
     this.requestsQueue
       .pipe(
-        map(request =>
-          of(request).pipe(
-            delay(REQUEST_SPAM_TIMEOUT_MS),
-          ),
-        ),
+        map(request => of(request).pipe(delay(REQUEST_SPAM_TIMEOUT_MS))),
         concatAll(),
         tap(request => this.logger.log(`request ${JSON.stringify(request)}`, CONFIG.logging.ggChatAllEvents)),
       )
       .subscribe(request => this.chatConnection.next(request));
 
-    return this.chatConnection.pipe(
-      take(1),
-    );
+    return this.chatConnection.pipe(take(1));
   }
 
   public onEvent<T extends keyof IChatEventMap>(type: T): Observable<IChatEventMap[T]> {

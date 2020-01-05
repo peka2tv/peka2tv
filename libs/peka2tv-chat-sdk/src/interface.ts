@@ -1,7 +1,7 @@
 export interface IPeka2tvSdkConfig {
   url: string;
   logging: {
-    enabled: boolean,
+    enabled: boolean;
     main: boolean;
     all: boolean;
   };

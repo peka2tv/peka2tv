@@ -16,17 +16,14 @@
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
-      "@peka2tv/libs/*": [ "./libs/*" ]
+      "@peka2tv/libs/*": ["./libs/*"]
     },
     "importHelpers": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [ "es6" ],
+    "lib": ["es6"],
     "strict": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true
   },
-  "exclude": [
-    "node_modules",
-    "__test__"
-  ]
+  "exclude": ["node_modules", "__test__"]
 }
