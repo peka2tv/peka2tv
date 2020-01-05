@@ -1,6 +1,7 @@
 {
   "extends": [
-    "tslint:latest"
+    "tslint:latest",
+    "tslint-config-prettier"
   ],
   "rules": {
     "member-ordering": [ true, {
