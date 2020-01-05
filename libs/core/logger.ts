@@ -5,7 +5,7 @@ export class BasicLogger {
 
   constructor(private context: string, private enabled = true) {}
 
-  public log(message: any, enabled: boolean): void {
+  public log(message: any, enabled = true): void {
     if (!enabled || !this.enabled) {
       return;
     }
