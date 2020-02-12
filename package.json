@@ -12,10 +12,10 @@
     }
   },
   "dependencies": {
-    "@nestjs/common": "^6.10.13",
-    "@nestjs/core": "^6.10.13",
-    "@nestjs/microservices": "^6.10.13",
-    "@nestjs/platform-fastify": "^6.10.14",
+    "@nestjs/common": "^6.11.6",
+    "@nestjs/core": "^6.11.6",
+    "@nestjs/microservices": "^6.11.6",
+    "@nestjs/platform-fastify": "^6.11.6",
     "@types/lodash": "^4.14.149",
     "deepmerge": "^3.1.0",
     "html-entities": "^1.2.1",
