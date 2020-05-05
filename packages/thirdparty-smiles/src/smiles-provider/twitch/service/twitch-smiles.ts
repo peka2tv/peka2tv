@@ -23,12 +23,16 @@ export class TwitchSmilesService {
       .pipe(
         tap(() => this.logger.log(`started smiles loading`)),
         switchMap(() => this.twitchApiService.loadSmiles()),
+        tap(() => this.logger.log(`started smiles formatting`)),
         map(({ emoticons }) => this.formatSmiles(emoticons)),
-        tap(smiles => this.logger.log(`loaded ${smiles.length} smiles`)),
       )
       .subscribe(
-        smiles => smiles.forEach(smile => this.smilesStoreService.addSmile(smile)),
-        error => this.logger.log(`smiles loading error ${JSON.stringify(error)}`),
+        smiles => {
+          smiles.forEach(smile => this.smilesStoreService.addSmile(smile));
+
+          this.logger.log(`loaded ${smiles.length} smiles`);
+        },
+        error => this.logger.log(`smiles loading error ${error}`),
       );
   }
 

@@ -7,6 +7,10 @@ import isArray from 'lodash/isArray';
 export class SmilesController {
   constructor(private smilesStoreService: SmilesStoreService) {}
 
+  // Current implementation is cpu-optimized and requires a lot of memory to store all smiles full data
+  // this leads to high memory consumption and fast `getSmiles` response
+  // For memory-optimized you need to store minimum amount of data (e.x. only `id`/`code` fields for twitch smiles)
+  // and format final object on each `getSmiles` request
   @Post('/')
   @HttpCode(200)
   public getSmiles(@Body() requestSmiles: IRequestSmile[]): ISmile[] {

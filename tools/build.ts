@@ -49,7 +49,7 @@ function createBinary(): void {
   const jsBundleFile = getJsBundlePath();
   const binaryFile = path.resolve(PROJECT_DIRECTORY, DIST_FOLDER, projectName);
 
-  run(`yarn pkg --target=${target} ${jsBundleFile} -o ${binaryFile}`);
+  run(`yarn pkg --target=${target} --options max_old_space_size=4096 ${jsBundleFile} -o ${binaryFile}`);
 
   console.log(`(+) (${projectName}) creating binary done`);
 }

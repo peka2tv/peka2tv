@@ -13,4 +13,6 @@ if (!projectName) {
   process.exit(0);
 }
 
-run(`yarn ts-node -r tsconfig-paths/register ${serviceEntryPoint} ${argumentsString}`);
+run(
+  `node --max_old_space_size=4096 -r ts-node/register -r tsconfig-paths/register ${serviceEntryPoint} ${argumentsString}`,
+);
