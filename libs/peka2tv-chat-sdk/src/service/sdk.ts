@@ -28,9 +28,7 @@ export class Peka2tvChatSdkService implements OnModuleInit {
 
     this.onEvent('connect').subscribe(() => this.logger.log('sdk connected', this.sdkConfig.logging.main));
 
-    this.onEvent<any>('error').subscribe(error =>
-      this.logger.log(`sdk error ${JSON.stringify(error)}`, this.sdkConfig.logging.main),
-    );
+    this.onEvent<any>('error').subscribe(error => this.logger.log(`sdk error ${error}`, this.sdkConfig.logging.main));
 
     this.onEvent('disconnect').subscribe(() => this.logger.log('sdk disconnect', this.sdkConfig.logging.main));
 
@@ -48,7 +46,7 @@ export class Peka2tvChatSdkService implements OnModuleInit {
   }
 
   public send(message: IPeka2tvChatNewMessage): void {
-    this.logger.log(`send ${JSON.stringify(message)}`, this.sdkConfig.logging.all);
+    this.logger.log(`send ${message}`, this.sdkConfig.logging.all);
 
     this.sdkConnection.emit('/sdk/publish', message);
   }

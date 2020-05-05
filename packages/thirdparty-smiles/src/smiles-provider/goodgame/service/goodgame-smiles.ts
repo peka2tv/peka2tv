@@ -25,7 +25,7 @@ export class GoodgameSmilesService {
       )
       .subscribe(
         smiles => smiles.forEach(smile => this.smilesStoreService.addSmile(smile, smile.animated)),
-        error => this.logger.log(`smiles loading error ${JSON.stringify(error)}`),
+        error => this.logger.log(`smiles loading error ${error}`),
       );
   }
 
