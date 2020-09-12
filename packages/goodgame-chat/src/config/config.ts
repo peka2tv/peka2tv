@@ -12,7 +12,7 @@ export const defaultConfig = {
     url: 'http://127.0.0.1:3812',
   },
   endpoints: {
-    chat: 'wss://chat.goodgame.ru/chat/websocket',
+    chat: 'wss://chat-1.goodgame.ru/chat2/',
     api: 'https://goodgame.ru/api',
   },
   db: {
