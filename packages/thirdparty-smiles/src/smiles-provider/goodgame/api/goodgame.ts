@@ -23,10 +23,10 @@ export class GoodgameApiService {
   private formatSmilesStringToObject(smilesString: string): IGoodgameSmiles | null {
     smilesString = smilesString
       .replace(/(var Global\n= )/, '')
-      .replace('Smiles : ', '"Smiles" : ')
-      .replace('Channel_Smiles : ', '"Channel_Smiles" : ')
-      .replace('SmilesPacked : ', '"SmilesPacked" : ')
-      .replace('timezone_offset : ', '"timezone_offset" : ')
+      .replace('Smiles :', '"Smiles" : ')
+      .replace('Channel_Smiles :', '"Channel_Smiles" : ')
+      .replace('SmilesPacked :', '"SmilesPacked" : ')
+      .replace('timezone_offset :', '"timezone_offset" : ')
       .replace('Content_Width:', '"Content_Width":')
       // last ';'
       .slice(0, -2);
