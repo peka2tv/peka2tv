@@ -32,7 +32,7 @@ function createJsBundle(): void {
   };
 
   const webpackEnvOptions = Object.keys(webpackConfigOptions)
-    .map(option => `--env.${option}="${webpackConfigOptions[option]}"`)
+    .map(option => `--env ${option}="${webpackConfigOptions[option]}"`)
     .join(' ');
 
   run(`yarn webpack --config ${WEBPACK_CONFIG} ${webpackEnvOptions}`);
@@ -45,7 +45,7 @@ function createBinary(): void {
 
   const platform = getBinaryTargetPlatform();
 
-  const target = `node8-${platform}-x64`;
+  const target = `node16-${platform}-x64`;
   const jsBundleFile = getJsBundlePath();
   const binaryFile = path.resolve(PROJECT_DIRECTORY, DIST_FOLDER, projectName);
 
