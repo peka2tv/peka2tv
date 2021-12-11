@@ -37,7 +37,7 @@ export class ChatConnectionService implements OnModuleInit {
           this.logger.log(`event ${JSON.stringify(event)}`, true);
         }
       },
-      error: error => this.logger.log(`error ${error}`, CONFIG.logging.ggChatMainEvents),
+      error: error => this.logger.log(`error ${JSON.stringify(error)}`, CONFIG.logging.ggChatMainEvents),
       complete: () => this.logger.log(`completed`, CONFIG.logging.ggChatMainEvents),
     });
 
@@ -45,7 +45,7 @@ export class ChatConnectionService implements OnModuleInit {
       .pipe(
         map(request => of(request).pipe(delay(REQUEST_SPAM_TIMEOUT_MS))),
         concatAll(),
-        tap(request => this.logger.log(`request ${request}`, CONFIG.logging.ggChatAllEvents)),
+        tap(request => this.logger.log(`request ${JSON.stringify(request)}`, CONFIG.logging.ggChatAllEvents)),
       )
       .subscribe(request => this.chatConnection.next(request));
 
