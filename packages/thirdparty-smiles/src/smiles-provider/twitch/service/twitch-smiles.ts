@@ -11,7 +11,7 @@ import { CONFIG } from '../../../config/config';
 const SMILE_PREFIX = 'tw-';
 const DEFAULT_WIDTH_PX = null;
 const DEFAULT_HEIGHT_PX = 28;
-const IMAGE_URL_TEMPLATE = 'https://static-cdn.jtvnw.net/emoticons/v1/{{ id }}/1.0';
+const IMAGE_URL_TEMPLATE = 'https://static-cdn.jtvnw.net/emoticons/v2/{{ id }}/default/dark/2.0';
 const UPDATE_INTERVAL_MS = 12 * 3600 * 1000;
 
 @Injectable()
@@ -24,7 +24,7 @@ export class TwitchSmilesService {
         tap(() => this.logger.log(`started smiles loading`)),
         switchMap(() => this.twitchApiService.loadSmiles()),
         tap(() => this.logger.log(`started smiles formatting`)),
-        map(({ emoticons }) => this.formatSmiles(emoticons)),
+        map(({ data }) => this.formatSmiles(data)),
       )
       .subscribe(
         smiles => {
@@ -38,10 +38,10 @@ export class TwitchSmilesService {
 
   private formatSmiles(twitchSmiles: ITwitchSmile[]): ISmileMain[] {
     return twitchSmiles
-      .filter(smile => smile.code.indexOf('\\') === -1)
+      .filter(smile => smile.name.indexOf('\\') === -1)
       .map(smile => ({
         id: null,
-        code: `${SMILE_PREFIX}${smile.code.toLowerCase()}`,
+        code: `${SMILE_PREFIX}${smile.name.toLowerCase()}`,
         url: IMAGE_URL_TEMPLATE.replace('{{ id }}', smile.id),
         width: DEFAULT_WIDTH_PX,
         height: DEFAULT_HEIGHT_PX,

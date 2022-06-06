@@ -13,6 +13,7 @@ export const defaultConfig = {
   },
   twitch: {
     clientId: '',
+    clientSecret: '',
   },
 };
 

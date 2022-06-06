@@ -1,8 +1,8 @@
 export interface ITwitchSmile {
   id: string;
-  code: string;
+  name: string;
 }
 
 export interface ITwitchSmilesResponse {
-  emoticons: ITwitchSmile[];
+  data: ITwitchSmile[];
 }
